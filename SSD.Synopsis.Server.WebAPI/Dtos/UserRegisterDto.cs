@@ -1,8 +1,7 @@
-﻿namespace SSD.Synopsis.Server.Core.Models;
+﻿namespace SSD.Synopsis.Server.WebAPI.Dtos;
 
-public class User
+public class UserRegisterDto
 {
-    public string Guid { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
     public string Salt { get; set; }

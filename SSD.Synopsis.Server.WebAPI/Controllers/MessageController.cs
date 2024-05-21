@@ -11,5 +11,6 @@ namespace SSD.Synopsis.Server.WebAPI.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
+        
     }
 }

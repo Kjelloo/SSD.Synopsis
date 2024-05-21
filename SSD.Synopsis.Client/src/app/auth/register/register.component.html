@@ -1,0 +1,23 @@
+<div class="container d-flex align-items-center justify-content-center" style="height: 80vh;">
+  <div class="row">
+    <h1 class="text-center">Register</h1>
+    <hr>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <div class="mb-3">
+        <label for="name" class="form-label">Email</label>
+        <input id="name" type="email" formControlName="name" class="form-control" placeholder="username">
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" formControlName="password" class="form-control"
+               placeholder="must at least have 8 characters">
+      </div>
+
+      <div class="text-center d-flex justify-content-between">
+        <a class="align-self-start text-sm-center" [routerLink]="['/login']">Sign in</a>
+        <button class="btn btn-success align-self-end" type="submit" [disabled]="!registerForm.valid">Register</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -17,9 +17,10 @@ public class AuthService : IAuthService
 
     public string GenerateToken(User user)
     {
-        var claims = new List<Claim>()
+        var claims = new List<Claim>
         {
-            new(ClaimTypes.Sid, user.Guid)
+            new(ClaimTypes.Sid, user.Guid),
+            new(ClaimTypes.Name, user.Username)
         };
         
         var token = new JwtSecurityToken(
@@ -30,7 +31,7 @@ public class AuthService : IAuthService
                 null, // Todo: validate audience
                 claims.ToArray(),
                 DateTime.Now, // notBefore
-                DateTime.Now.AddMinutes(10))); // expires
+                DateTime.Now.AddHours(1))); // expires
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
