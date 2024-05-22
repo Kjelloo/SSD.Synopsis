@@ -4,14 +4,14 @@
     <hr>
     <form [formGroup]="registerForm" (ngSubmit)="register()">
       <div class="mb-3">
-        <label for="name" class="form-label">Email</label>
-        <input id="name" type="email" formControlName="name" class="form-control" placeholder="username">
+        <label for="username" class="form-label">Username</label>
+        <input id="username" type="text" formControlName="username" class="form-control" placeholder="johnsmith152">
       </div>
 
       <div class="mb-3">
         <label for="password" class="form-label">Password</label>
         <input id="password" type="password" formControlName="password" class="form-control"
-               placeholder="must at least have 8 characters">
+               placeholder="*********">
       </div>
 
       <div class="text-center d-flex justify-content-between">

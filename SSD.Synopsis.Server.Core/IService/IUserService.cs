@@ -7,4 +7,5 @@ public interface IUserService : IService<User>
     User GetByUsername(string username);
     JWToken Login(User user);
     User Register(User user);
+    string GetSalt(string username);
 }

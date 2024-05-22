@@ -4,6 +4,7 @@ import {environment} from "../../environments/environment";
 import {User} from "../shared/dtos/user.dto";
 import {HttpClient} from "@angular/common/http";
 import {RegisterUserDto} from "../shared/dtos/registeruser.dto";
+import {AuthUserDto} from "../shared/dtos/authuser.dto";
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  login(user: User): Observable<User> {
+  login(user: AuthUserDto): Observable<User> {
     return this.http.post<User>(environment.apiUrl + 'User/Login', user);
   }
 
@@ -22,6 +23,10 @@ export class AuthService {
 
   validateToken(token: string) {
     return this.http.post<boolean>(environment.apiUrl + 'User/ValidateToken/' + token, null);
+  }
+
+  getSalt(username: string) {
+    return this.http.get(environment.apiUrl + 'User/Salt/' + username, {responseType: 'text'});
   }
 
   authenticated() {

@@ -53,7 +53,7 @@ public class UserService : IUserService
         if (userDb == null)
             throw new InvalidOperationException("Invalid login");
 
-        if (!(user.Password+userDb.Salt).Equals(userDb.Password))
+        if (!user.Password.Equals(userDb.Password))
             throw new InvalidOperationException("Invalid login");
 
         var token = new JWToken
@@ -68,11 +68,26 @@ public class UserService : IUserService
 
     public User Register(User user)
     {
+        var userDb = _repo.GetByUsername(user.Username);
+        
+        if (userDb != null)
+            throw new InvalidOperationException("Username already taken");
+        
         if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) || string.IsNullOrEmpty(user.Salt))
             throw new InvalidOperationException("Invalid registration");
         
         user.Guid = Guid.NewGuid().ToString();
         
         return _repo.Add(user);
+    }
+
+    public string GetSalt(string username)
+    {
+        var userDb = _repo.GetByUsername(username);
+
+        if (userDb == null)
+            throw new InvalidOperationException("Invalid user");
+
+        return userDb.Salt;
     }
 }

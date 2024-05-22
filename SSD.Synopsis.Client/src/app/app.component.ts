@@ -5,11 +5,12 @@ import {LoginComponent} from "./auth/login/login.component";
 import {RegisterComponent} from "./auth/register/register.component";
 import {AuthService} from "./auth/auth.service";
 import {map} from "rxjs";
+import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ChatComponent, LoginComponent, RegisterComponent],
+  imports: [NgbModule, RouterOutlet, ChatComponent, LoginComponent, RegisterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

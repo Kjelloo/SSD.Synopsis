@@ -20,7 +20,7 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router, private securityService: SecurityService) {
     this.registerForm = new FormGroup({
-      name: new FormControl(
+      username: new FormControl(
         '',
         [
           Validators.required,
@@ -36,22 +36,19 @@ export class RegisterComponent {
     });
   }
 
-  ngOnInit(): void {
-
-  }
-
   register() {
     if (this.registerForm.valid) {
       let userLogin = this.registerForm.value as AuthUserDto;
 
       localStorage.clear();
+      userLogin.password = window.btoa(userLogin.password);
+      let userRegister = this.securityService.createUser(userLogin);
 
-      let user = this.securityService.createUser(userLogin);
-
-      user.then((user) => {
+      userRegister.then((user) => {
+        console.log(user.password);
         this.authService.register(user).subscribe({
-          next: (user) => {
-            this.router.navigate(['/login']);
+          next: async (user) => {
+            await this.router.navigate(['/login']);
           },
           error: (error) => {
             console.error('Could not register');
@@ -61,8 +58,8 @@ export class RegisterComponent {
     }
   }
 
-  get email() {
-    return this.registerForm.get('email')
+  get username() {
+    return this.registerForm.get('username')
   }
 
   get password() {

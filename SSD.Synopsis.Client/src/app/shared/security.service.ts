@@ -17,18 +17,39 @@ export class SecurityService {
 
     let exportKey = await crypto.subtle.exportKey("raw", key);
 
-    let decoder = new TextDecoder();
+    let decodedKey = this.arrayBufferToBase64(exportKey);
+    let decodedSalt = this.arrayBufferToBase64(salt);
 
     return {
       username: userLogin.username,
-      password: decoder.decode(exportKey),
-      salt: decoder.decode(salt)
+      password: decodedKey,
+      salt: decodedSalt
     };
   }
 
+  arrayBufferToBase64(buffer: ArrayBuffer) {
+    let binary = '';
+    let bytes = new Uint8Array(buffer);
+    let len = bytes.byteLength;
+
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return window.btoa(binary);
+  }
+
+  base64ToArrayBuffer(base64: string) {
+    let binaryString = atob(base64);
+    let bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+  }
 
   async deriveKey(password: string, salt: ArrayBuffer, iter: number): Promise<CryptoKey> {
-    let key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+    let key = await crypto.subtle.importKey("raw", this.base64ToArrayBuffer(password), "PBKDF2", false, ["deriveKey"]);
     return crypto.subtle.deriveKey(
       {
         name: "PBKDF2",

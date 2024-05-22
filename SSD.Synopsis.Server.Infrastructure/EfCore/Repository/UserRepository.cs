@@ -53,6 +53,7 @@ public class UserRepository : IUserRepository
 
     public User GetByUsername(string username)
     {
-        return _ctx.Users.FirstOrDefault(user => user.Username.Equals(username)) ?? throw new InvalidOperationException();
+        username = username.ToLower();
+        return _ctx.Users.FirstOrDefault(user => user.Username.Equals(username));
     }
 }

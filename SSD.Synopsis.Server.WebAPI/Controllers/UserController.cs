@@ -66,8 +66,7 @@ public class UserController : ControllerBase
             var user = new User
             {
                 Username = userDto.Username,
-                Password = userDto.Password,
-                Salt = userDto.Salt
+                Password = userDto.Password
             };
 
             return Ok(_userService.Login(user));
@@ -88,6 +87,20 @@ public class UserController : ControllerBase
             return Ok(validated);
         }
         catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+    
+    [HttpGet("Salt/{username}")]
+    public ActionResult<string> Prepare(string username)
+    {
+        try
+        {
+            var salt = _userService.GetSalt(username);
+                
+            return Ok(salt);
+        } catch (Exception e)
         {
             return BadRequest(e.Message);
         }

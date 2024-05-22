@@ -1,1 +1,23 @@
-<p>login works!</p>
+<div class="container d-flex align-items-center justify-content-center" style="height: 80vh;">
+  <div class="row">
+    <h1 class="text-center">Login</h1>
+    <hr>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input id="username" type="text" formControlName="username" class="form-control" placeholder="johnsmith123">
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input id="password" type="password" formControlName="password" class="form-control"
+               placeholder="**********">
+      </div>
+
+      <div class="text-center d-flex justify-content-between">
+        <a class="align-self-start text-sm-center" [routerLink]="['/register']">Sign up</a>
+        <button class="btn btn-success align-self-end" type="submit" [disabled]="!loginForm.valid">Login</button>
+      </div>
+    </form>
+  </div>
+</div>

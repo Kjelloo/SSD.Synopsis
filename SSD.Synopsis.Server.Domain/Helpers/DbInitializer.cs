@@ -5,7 +5,8 @@ namespace SSD.Synopsis.Server.Domain.Helpers;
 public class DbInitializer : IDbInitialzier<ChattingDbContext>
 {
     public void Initialize(ChattingDbContext context)
-    { 
+    {
+        context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
 }
