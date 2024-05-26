@@ -15,12 +15,13 @@ public class MessageService : IMessageService
 
     public Message Add(Message entity)
     {
+        entity.Guid = Guid.NewGuid().ToString();
         return _repo.Add(entity);
     }
 
-    public Message Get(string id)
+    public Message Get(string guid)
     {
-        return _repo.Get(id);
+        return _repo.Get(guid);
     }
 
     public IEnumerable<Message> GetAll()
@@ -40,11 +41,16 @@ public class MessageService : IMessageService
 
     public IEnumerable<Message> GetMessagesByChatRoom(string chatRoomId)
     {
-        return _repo.GetMessagesByChatRoomId(chatRoomId);
+        return _repo.GetMessagesByChatRoomGuid(chatRoomId);
     }
 
     public IEnumerable<Message> GetMessagesByUserId(string userId)
     {
-        return _repo.GetMessagesByUserId(userId);
+        return _repo.GetMessagesByUserGuid(userId);
+    }
+
+    public bool DeleteMessagesByUserGuid(string userGuid)
+    {
+        return _repo.DeleteMessagesByUserGuid(userGuid);
     }
 }

@@ -6,4 +6,5 @@ public interface IMessageService : IService<Message>
 {
     IEnumerable<Message> GetMessagesByChatRoom(string chatRoomId);
     IEnumerable<Message> GetMessagesByUserId(string userId);
+    bool DeleteMessagesByUserGuid(string userGuid);
 }

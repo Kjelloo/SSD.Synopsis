@@ -22,7 +22,7 @@ public class AuthService : IAuthService
             new(ClaimTypes.Sid, user.Guid),
             new(ClaimTypes.Name, user.Username)
         };
-        
+
         var token = new JwtSecurityToken(
             new JwtHeader(new SigningCredentials(
                 new SymmetricSecurityKey(_secret),
@@ -31,7 +31,7 @@ public class AuthService : IAuthService
                 null, // Todo: validate audience
                 claims.ToArray(),
                 DateTime.Now, // notBefore
-                DateTime.Now.AddHours(1))); // expires
+                DateTime.Now.AddMonths(1))); // expires
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = new SymmetricSecurityKey(_secret);
-        
+
         tokenHandler.ValidateToken(token, new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -48,8 +48,8 @@ public class AuthService : IAuthService
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = key
-        }, out SecurityToken validatedToken);
-        
+        }, out var validatedToken);
+
         return validatedToken != null;
     }
 }

@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {SecurityService} from "../../shared/security.service";
 import {AuthService} from "../auth.service";
 import {AuthUserDto} from "../../shared/dtos/authuser.dto";
 import {environment} from "../../../environments/environment";
+import {db} from "../../chat/db/db";
 
 @Component({
   selector: 'app-login',
@@ -16,9 +17,8 @@ import {environment} from "../../../environments/environment";
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
   loginForm: FormGroup;
-
 
   constructor(private authService: AuthService, private router: Router, private securityService: SecurityService) {
     this.loginForm = new FormGroup({
@@ -38,13 +38,16 @@ export class LoginComponent {
     });
   }
 
+  ngOnInit(): void {
+
+  }
+
   async login() {
     if (this.loginForm.valid) {
 
       localStorage.clear();
       let userLogin = this.loginForm.value as AuthUserDto;
       userLogin.password = window.btoa(userLogin.password);
-      console.log("userLogin.password: " + userLogin.password);
 
       // Get salt from server for a given username
       this.authService.getSalt(userLogin.username).subscribe({
@@ -61,14 +64,18 @@ export class LoginComponent {
           console.log(userLogin.password);
 
           this.authService.login(userLogin).subscribe({
-            next: (user) => {
+            next: async (user) => {
               if (user && user.token != undefined && user.token.length > 0) {
                 localStorage.setItem('user', JSON.stringify(user));
 
+                console.log(user.guid!);
+
+                if (await db.users.where("guid").equalsIgnoreCase(user.guid!).count() == 0) {
+                  db.users.add(user);
+                }
+
                 this.router.navigate(['chat']);
               }
-
-              console.error('Could not login');
             },
             error: (error) => {
               console.error('Could not login');

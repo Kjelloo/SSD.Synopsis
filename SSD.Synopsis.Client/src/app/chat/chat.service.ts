@@ -1,48 +1,31 @@
-import { Injectable } from '@angular/core';
-import * as signalR from '@microsoft/signalr';
-import {Observable} from "rxjs";
+import {Injectable} from '@angular/core';
+import {ChatRoomDto} from "./db/db";
+import {HttpClient} from "@angular/common/http";
+import {SecurityService} from "../shared/security.service";
+import {environment} from "../../environments/environment";
+import {CreateChatRoomDto} from "../shared/dtos/createchatroom.dto";
+import {MessageDto} from "../shared/dtos/message.dto";
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  private hubConnection: signalR.HubConnection;
-  constructor() {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl("http://localhost:5240/chat", {
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets
-      })
-      .build();
+  constructor(private http: HttpClient, private securityService: SecurityService) {}
+
+  createMessage(message: MessageDto) {
+    return this.http.post<MessageDto>(environment.apiUrl + 'Message', message);
   }
 
-  startConnection(): Observable<void> {
-    return new Observable<void>((observer) => {
-      this.hubConnection
-        .start()
-        .then(() => {
-          console.log('Connection established with SignalR hub');
-          observer.next();
-          observer.complete();
-        })
-        .catch((error) => {
-          console.error('Error connecting to SignalR hub:', error);
-          observer.error(error);
-        });
-    });
+  getMessages(chatRoomGuid: string) {
+    return this.http.get<MessageDto[]>(environment.apiUrl + `Message/${chatRoomGuid}`);
   }
 
-  receiveMessage(): Observable<string> {
-    return new Observable<string>((observer) => {
-      this.hubConnection.on('ReceiveMessage', (message: string) => {
-        observer.next(message);
-      });
-    });
+  createChatRoom(createChatRoom: CreateChatRoomDto)
+  {
+    return this.http.post<ChatRoomDto>(environment.apiUrl + 'ChatRoom', createChatRoom);
   }
 
-  sendMessage(message: string): void {
-    this.hubConnection.invoke('SendMessage', "kjell", message)
-      .then(r => console.log(r))
-        .catch(e => console.error(e));
+  getChatRooms(userGuid: string) {
+    return this.http.get<ChatRoomDto[]>(environment.apiUrl + `ChatRoom/${userGuid}`);
   }
 }

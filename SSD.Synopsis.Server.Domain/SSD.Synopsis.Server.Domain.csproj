@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SSD.Synopsis.Server.Core\SSD.Synopsis.Server.Core.csproj" />
-      <ProjectReference Include="..\SSD.Synopsis.Server.Infrastructure\SSD.Synopsis.Server.Infrastructure.csproj" />
+        <ProjectReference Include="..\SSD.Synopsis.Server.Core\SSD.Synopsis.Server.Core.csproj"/>
+        <ProjectReference Include="..\SSD.Synopsis.Server.Infrastructure\SSD.Synopsis.Server.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

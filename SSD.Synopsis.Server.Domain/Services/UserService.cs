@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-using SSD.Synopsis.Server.Core.IRepository;
+﻿using SSD.Synopsis.Server.Core.IRepository;
 using SSD.Synopsis.Server.Core.IService;
 using SSD.Synopsis.Server.Core.Models;
 
@@ -7,8 +6,8 @@ namespace SSD.Synopsis.Server.Domain.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _repo;
     private readonly IAuthService _authService;
+    private readonly IUserRepository _repo;
 
     public UserService(IUserRepository repo, IAuthService authService)
     {
@@ -21,9 +20,9 @@ public class UserService : IUserService
         return _repo.Add(entity);
     }
 
-    public User Get(string id)
+    public User Get(string guid)
     {
-        return _repo.Get(id);
+        return _repo.Get(guid);
     }
 
     public IEnumerable<User> GetAll()
@@ -58,7 +57,7 @@ public class UserService : IUserService
 
         var token = new JWToken
         {
-            UserGuid = userDb.Guid,
+            Guid = userDb.Guid,
             Username = userDb.Username,
             Token = _authService.GenerateToken(userDb)
         };
@@ -69,15 +68,16 @@ public class UserService : IUserService
     public User Register(User user)
     {
         var userDb = _repo.GetByUsername(user.Username);
-        
+
         if (userDb != null)
             throw new InvalidOperationException("Username already taken");
-        
-        if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) || string.IsNullOrEmpty(user.Salt))
+
+        if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password) ||
+            string.IsNullOrEmpty(user.Salt))
             throw new InvalidOperationException("Invalid registration");
-        
+
         user.Guid = Guid.NewGuid().ToString();
-        
+
         return _repo.Add(user);
     }
 

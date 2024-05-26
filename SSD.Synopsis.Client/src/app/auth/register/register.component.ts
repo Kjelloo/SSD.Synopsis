@@ -4,6 +4,7 @@ import {AuthService} from "../auth.service";
 import {Router, RouterLink} from "@angular/router";
 import {SecurityService} from "../../shared/security.service";
 import {AuthUserDto} from "../../shared/dtos/authuser.dto";
+import {db} from "../../chat/db/db";
 
 @Component({
   selector: 'app-register',
@@ -36,20 +37,33 @@ export class RegisterComponent {
     });
   }
 
-  register() {
+  async register() {
     if (this.registerForm.valid) {
       let userLogin = this.registerForm.value as AuthUserDto;
 
-      localStorage.clear();
       userLogin.password = window.btoa(userLogin.password);
       let userRegister = this.securityService.createUser(userLogin);
 
-      userRegister.then((user) => {
-        console.log(user.password);
+      userRegister.then(async (user) => {
+        let keyPair = await this.securityService.generateKeyPair();
+
+        let publicKey = await crypto.subtle.exportKey("raw", keyPair.publicKey);
+        // export private key to JSON Web Key. Private keys can only be exported as JWK
+        let privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+
+        user.publicKey = this.securityService.arrayBufferToBase64(publicKey);
+        console.log(user.publicKey);
+
         this.authService.register(user).subscribe({
           next: async (user) => {
+            user.privateKey = JSON.stringify(privateKey, null, 2);
+
+            // save user to local database
+            db.users.add(user);
+
             await this.router.navigate(['/login']);
           },
+
           error: (error) => {
             console.error('Could not register');
           }

@@ -1,1 +1,50 @@
-<button (click)="sendMessage('message sent')">Send message</button>
+<div class="container-fluid d-flex flex-column min-vh-100">
+  <div class="row flex-grow-1">
+    <!-- Chat Rooms Sidebar -->
+    <div class="col-3 bg-light border-right d-flex flex-column p-0">
+      <!-- Logout Button -->
+      <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5>Welcome {{this.user.username}}!</h5>
+        <button class="btn btn-danger btn-md" (click)="logout()">Logout</button>
+      </div>
+      <!-- Create Chat Room Bar -->
+      <div class="p-3 border-bottom">
+        <h5>Create Chat Room</h5>
+        <form (ngSubmit)="createChatRoom()">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Enter username" [(ngModel)]="newChatRoomName" name="chatRoomName" required>
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">Create</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- List of Chat Rooms -->
+      <div class="list-group list-group-flush flex-grow-1 overflow-auto">
+        <a *ngFor="let chatRoom of chatRooms$ | async"
+           (click)="selectChatRoom(chatRoom)"
+           class="list-group-item list-group-item-action">
+          {{ chatRoom.username1 === user.username ? chatRoom.username2 : chatRoom.username1}}
+        </a>
+      </div>
+    </div>
+    <!-- Messages Container -->
+    <div class="col-9 d-flex flex-column p-0">
+      <div class="flex-grow-1 p-3 overflow-auto" id="messages-container">
+        <div *ngFor="let message of messages$ | async" class="mb-2">
+          <strong>{{ message.senderUsername }}:</strong> {{ message.text }}
+        </div>
+      </div>
+      <div class="p-3 border-top">
+        <form (ngSubmit)="sendMessage(newMessage)">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Type a message..." [(ngModel)]="newMessage" name="message" required>
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

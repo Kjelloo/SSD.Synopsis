@@ -21,9 +21,9 @@ public class MessageRepository : IMessageRepository
         return messageAdded;
     }
 
-    public Message Get(string id)
+    public Message Get(string guid)
     {
-        return _ctx.Messages.FirstOrDefault(m => m.Guid.Equals(id)) ?? throw new InvalidOperationException();
+        return _ctx.Messages.FirstOrDefault(m => m.Guid.Equals(guid)) ?? throw new InvalidOperationException();
     }
 
     public IEnumerable<Message> GetAll()
@@ -41,22 +41,30 @@ public class MessageRepository : IMessageRepository
     public Message Remove(Message entity)
     {
         var messageRemove = _ctx.Messages.FirstOrDefault(message => message.Guid.Equals(entity.Guid));
-        
+
         if (messageRemove == null)
             throw new InvalidOperationException();
-        
+
         _ctx.Messages.Remove(messageRemove);
         _ctx.SaveChanges();
         return messageRemove;
     }
 
-    public IEnumerable<Message> GetMessagesByChatRoomId(string chatRoomsId)
+    public IEnumerable<Message> GetMessagesByChatRoomGuid(string chatRoomsId)
     {
         return _ctx.Messages.Where(m => m.ChatRoomId.Equals(chatRoomsId));
     }
 
-    public IEnumerable<Message> GetMessagesByUserId(string userId)
+    public IEnumerable<Message> GetMessagesByUserGuid(string userId)
     {
-        return _ctx.Messages.Where(m => m.Guid.Equals(userId));
+        return _ctx.Messages.Where(m => m.SenderGuid.Equals(userId));
+    }
+
+    public bool DeleteMessagesByUserGuid(string userGuid)
+    {
+        var messages = _ctx.Messages.Where(m => m.SenderGuid.Equals(userGuid));
+        _ctx.Messages.RemoveRange(messages);
+        _ctx.SaveChanges();
+        return true;
     }
 }

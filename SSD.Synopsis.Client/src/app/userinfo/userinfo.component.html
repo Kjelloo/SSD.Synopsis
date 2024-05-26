@@ -1,0 +1,75 @@
+<div class="container mt-5">
+  <div class="row mb-lg-4 align-items-center">
+    <div class="col-md-6 text-start">
+      <h3>Delete all user information?</h3>
+    </div>
+    <div class="col-md-6 text-end">
+      <button class="btn btn-danger" (click)="deleteAllUserData()">Delete all user data</button>
+    </div>
+  </div>
+  <div class="row">
+    <!-- User Information -->
+    <div class="col-md-4 mb-4">
+      <h3>User information</h3>
+      <div class="card">
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Username:</strong> {{ user?.username }}</li>
+            <li class="list-group-item"><strong>GUID:</strong> {{ user?.guid }}</li>
+            <li class="list-group-item"><strong>Salt:</strong> {{ user?.salt }}</li>
+            <li class="list-group-item"><strong>Public key:</strong> {{ user?.publicKey }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="col-md-4 mb-4">
+      <h3>Messages</h3>
+      <div ngbAccordion>
+        <div ngbAccordionItem *ngFor="let message of messages">
+          <h2 ngbAccordionHeader>
+            <button ngbAccordionButton>{{message.guid}}</button>
+          </h2>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody>
+              <ng-template>
+                <ul>
+                  <li><strong>Sender:</strong> {{message.senderUsername}}</li>
+                  <li><strong>Recipient chat room guid:</strong> {{message.guid}}</li>
+                  <li><strong>Text:</strong> {{message.text}}</li>
+                  <li><strong>Time Sent:</strong> {{message.timeSent | date}}</li>
+                </ul>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <h3>Chat rooms</h3>
+      <div ngbAccordion>
+        <div ngbAccordionItem *ngFor="let room of chatRooms">
+          <h2 ngbAccordionHeader>
+            <button ngbAccordionButton>{{room.guid}}</button>
+          </h2>
+          <div ngbAccordionCollapse>
+            <div ngbAccordionBody>
+              <ng-template>
+                <ul>
+                  <li><strong>User 1 guid:</strong> {{ room.userGuid1 }}</li>
+                  <li><strong>User 1 username:</strong> {{ room.username1 }}</li>
+                  <li><strong>User 1 public key:</strong> {{ room.publicKey1 }}</li>
+                  <li><strong>User 2 guid:</strong> {{ room.userGuid2 }}</li>
+                  <li><strong>User 2 username:</strong> {{ room.username2 }}</li>
+                  <li><strong>User 2 public key:</strong> {{ room.publicKey2 }}</li>
+                </ul>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   register(user: RegisterUserDto) {
-    return this.http.post(environment.apiUrl + 'User/Register', user);
+    return this.http.post<User>(environment.apiUrl + 'User/Register', user);
   }
 
   validateToken(token: string) {

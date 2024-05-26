@@ -21,9 +21,9 @@ public class ChatRoomRepository : IChatRoomRepository
         return chatRoomAdded;
     }
 
-    public ChatRoom Get(string id)
+    public ChatRoom Get(string guid)
     {
-        return _ctx.ChatRooms.FirstOrDefault(c => c.Guid.Equals(id)) ?? throw new InvalidOperationException();
+        return _ctx.ChatRooms.FirstOrDefault(c => c.Guid.Equals(guid)) ?? throw new InvalidOperationException();
     }
 
     public IEnumerable<ChatRoom> GetAll()
@@ -41,10 +41,10 @@ public class ChatRoomRepository : IChatRoomRepository
     public ChatRoom Remove(ChatRoom entity)
     {
         var chatRoomRemove = _ctx.ChatRooms.FirstOrDefault(chatRoom => chatRoom.Guid.Equals(entity.Guid));
-        
+
         if (chatRoomRemove == null)
             throw new InvalidOperationException();
-        
+
         _ctx.ChatRooms.Remove(chatRoomRemove);
         _ctx.SaveChanges();
         return chatRoomRemove;
@@ -53,5 +53,14 @@ public class ChatRoomRepository : IChatRoomRepository
     public IEnumerable<ChatRoom> GetChatsByUserGuid(string userGuid)
     {
         return _ctx.ChatRooms.Where(c => c.UserGuid1.Equals(userGuid) || c.UserGuid2.Equals(userGuid));
+    }
+
+    public bool DeleteChatRoomsByUserGuid(string userGuid)
+    {
+        var chatRooms = _ctx.ChatRooms.Where(c => c.UserGuid1.Equals(userGuid) || c.UserGuid2.Equals(userGuid));
+
+        _ctx.ChatRooms.RemoveRange(chatRooms);
+        _ctx.SaveChanges();
+        return true;
     }
 }

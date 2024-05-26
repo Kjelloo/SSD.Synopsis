@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SSD.Synopsis.Server.Core.IRepository;
 using SSD.Synopsis.Server.Core.Models;
 using SSD.Synopsis.Server.Infrastructure.EfCore.Context;
@@ -22,9 +21,9 @@ public class UserRepository : IUserRepository
         return userAdded;
     }
 
-    public User Get(string id)
+    public User Get(string guid)
     {
-        return _ctx.Users.FirstOrDefault(u => u.Guid.Equals(id)) ?? throw new InvalidOperationException();
+        return _ctx.Users.FirstOrDefault(u => u.Guid.Equals(guid)) ?? throw new InvalidOperationException();
     }
 
     public IEnumerable<User> GetAll()
@@ -42,10 +41,10 @@ public class UserRepository : IUserRepository
     public User Remove(User entity)
     {
         var userRemove = _ctx.Users.FirstOrDefault(user => user.Guid.Equals(entity.Guid));
-        
+
         if (userRemove == null)
             throw new InvalidOperationException();
-        
+
         _ctx.Users.Remove(userRemove);
         _ctx.SaveChanges();
         return userRemove;

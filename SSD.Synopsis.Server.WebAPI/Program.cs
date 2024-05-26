@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,9 +11,11 @@ using SSD.Synopsis.Server.Infrastructure.EfCore.Repository;
 using SSD.Synopsis.Server.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
-var secret = RandomNumberGenerator.GetBytes(32);
+
+var secret = File.ReadAllBytes("secret.bin");
+
 // Add services to the container.
-builder.Services.AddDbContext<ChattingDbContext>(opt => 
+builder.Services.AddDbContext<ChattingDbContext>(opt =>
     opt.UseSqlite("Data Source=ChatDb.db"));
 builder.Services.AddTransient<IDbInitialzier<ChattingDbContext>, DbInitializer>();
 
@@ -24,7 +25,7 @@ builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
-builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
 
 builder.Services.AddSingleton<IAuthService>(sp => new AuthService(secret));
 
@@ -51,11 +52,11 @@ builder.Services.AddSwaggerGen(opt =>
             {
                 Reference = new OpenApiReference
                 {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
             },
-            new string[]{}
+            new string[] { }
         }
     });
 });
@@ -84,7 +85,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(secret)
-        }; 
+        };
     });
 
 var app = builder.Build();
@@ -99,7 +100,7 @@ if (app.Environment.IsDevelopment())
         var dbInit = services.GetService<IDbInitialzier<ChattingDbContext>>();
         dbInit.Initialize(context);
     }
-    
+
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseCors("dev-cors");
@@ -109,7 +110,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthorization();
 
-app.MapHub<ChattingHub>("/chat");
 app.MapControllers();
 
 app.Run();
