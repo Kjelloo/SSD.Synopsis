@@ -61,7 +61,8 @@ export class ChatComponent implements OnInit {
 
           for (let chatRoom of newChatRooms) {
             let publicKey = chatRoom.publicKey1 === publicKeyLoggedIn! ? chatRoom.publicKey2 : chatRoom.publicKey1;
-            chatRoom.sharedKey = await this.securityService.deriveSharedKey(publicKey!);
+            // todo: decrypt with private key
+            // chatRoom.sharedKey = await this.securityService.deriveSharedKey(publicKey!);
           }
 
           await db.chatRooms.bulkAdd(newChatRooms);
@@ -77,14 +78,15 @@ export class ChatComponent implements OnInit {
   }
 
   async sendMessage(message: string): Promise<void> {
-    let encryptedMessage = await this.securityService.createMessage(message, this.selectedChatRoom!.guid!, this.user.guid!, this.user.username!, this.selectedChatRoom?.sharedKey!);
+    let publicKey = this.selectedChatRoom?.publicKey1 === this.currentUser?.publicKey ? this.selectedChatRoom?.publicKey2 : this.selectedChatRoom?.publicKey1;
+
+    let encryptedMessage = await this.securityService.createMessage(message, this.selectedChatRoom!.guid!, this.user.guid!, this.user.username!, publicKey!);
 
     this.chatService.createMessage(encryptedMessage).subscribe({
       next: async (message) => {
-        let decryptedMessage = await this.securityService.decryptMessageString(message, this.selectedChatRoom!.sharedKey!);
+        let decryptedMessage = await this.securityService.decryptMessageString(message, this.currentUser?.privateKey!);
         this.messages$!.subscribe(messages => {
           messages.push(decryptedMessage);
-
         });
         this.newMessage = '';
       },
@@ -105,9 +107,6 @@ export class ChatComponent implements OnInit {
 
     chatRoom.subscribe({
       next: async (chatRoom) => {
-
-        chatRoom.sharedKey = await this.securityService.deriveSharedKey(chatRoom.publicKey2!);
-
         db.chatRooms.add(chatRoom);
         this.selectChatRoom(chatRoom);
       },
@@ -121,7 +120,7 @@ export class ChatComponent implements OnInit {
   protected selectChatRoom(chatRoom: ChatRoomDto) {
     this.selectedChatRoom = chatRoom;
     this.messages$ = this.chatService.getMessages(chatRoom.guid!).pipe(
-      switchMap(messages => from(this.securityService.decryptMessages(messages, chatRoom.sharedKey!))
+      switchMap(messages => from(this.securityService.decryptMessages(messages, this.currentUser?.privateKey!))
     ));
   }
 

@@ -12,6 +12,163 @@ export class SecurityService {
 
   constructor() { }
 
+  // async generateKeyPair() {
+  //   return await window.crypto.subtle.generateKey(
+  //     {
+  //       name: "ECDH",
+  //       namedCurve: "P-384",
+  //     },
+  //     true,
+  //     ["deriveKey"]
+  //   );
+  // }
+
+  // async deriveSharedKey(remotePublicKey: string) {
+  //   let userId = JSON.parse(localStorage.getItem('user')!).guid;
+  //
+  //   let ownPrivateKey = await this.getPrivateKey(userId);
+  //
+  //   let remotePublicKeyImported = await window.crypto.subtle.importKey(
+  //     "raw",
+  //     this.base64ToArrayBuffer(remotePublicKey),
+  //     {
+  //       name: "ECDH",
+  //       namedCurve: "P-384",
+  //     },
+  //     true,
+  //     []
+  //   );
+  //
+  //   let derivedKey = await window.crypto.subtle.deriveKey(
+  //     {
+  //       name: "ECDH",
+  //       public: remotePublicKeyImported,
+  //     },
+  //     ownPrivateKey,
+  //     {
+  //       name: "AES-CBC",
+  //       length: 256,
+  //     },
+  //     true,
+  //     ["encrypt", "decrypt"]
+  //   );
+  //
+  //   let sharedKey = await window.crypto.subtle.exportKey("raw", derivedKey);
+  //
+  //   return this.arrayBufferToBase64(sharedKey);
+  // }
+
+  // async encryptMessage(message: MessageDto, sharedKey: string) {
+  //
+  //   let IV = this.base64ToArrayBuffer(message.iv);
+  //
+  //   let key = await crypto.subtle.importKey(
+  //     "raw",
+  //     this.base64ToArrayBuffer(sharedKey),
+  //     "AES-CBC",
+  //     true,
+  //     ["encrypt", "decrypt"]
+  //   );
+  //
+  //   let encryptedText = await window.crypto.subtle.encrypt(
+  //     {
+  //       name: "AES-CBC",
+  //       iv: IV
+  //     },
+  //     key,
+  //     new TextEncoder().encode(message.text)
+  //   );
+  //
+  //   return {
+  //     ...message,
+  //     text: this.arrayBufferToBase64(encryptedText),
+  //   };
+  // }
+
+  // async decryptMessages(messages: MessageDto[], sharedKey: string): Promise<MessageDto[]> {
+  //   let decryptedMessages: MessageDto[] = [];
+  //
+  //   const key = await crypto.subtle.importKey(
+  //     "raw",
+  //     this.base64ToArrayBuffer(sharedKey),
+  //     "AES-CBC",
+  //     true,
+  //     ["encrypt", "decrypt"]
+  //   );
+  //
+  //   for (let message of messages) {
+  //
+  //     let decryptedMessage = await this.decryptMessage(message, key);
+  //     decryptedMessages.push(decryptedMessage);
+  //   }
+  //   return decryptedMessages;
+  // }
+
+  // async decryptMessage(message: MessageDto, sharedKey: CryptoKey): Promise<MessageDto> {
+  //   let iv = this.base64ToArrayBuffer(message.iv);
+  //
+  //   let decryptedText = await window.crypto.subtle.decrypt(
+  //     {
+  //       name: "AES-CBC",
+  //       iv: iv
+  //     },
+  //     sharedKey,
+  //     this.base64ToArrayBuffer(message.text)
+  //   );
+  //
+  //   return {
+  //     ...message,
+  //     text: new TextDecoder().decode(decryptedText)
+  //   };
+  // }
+
+  // async decryptMessageString(message: MessageDto, sharedKey: string): Promise<MessageDto> {
+  //
+  //   const key = await crypto.subtle.importKey(
+  //     "raw",
+  //     this.base64ToArrayBuffer(sharedKey),
+  //     "AES-CBC",
+  //     true,
+  //     ["encrypt", "decrypt"]
+  //   );
+  //
+  //   let iv = this.base64ToArrayBuffer(message.iv);
+  //   let decryptedText = await window.crypto.subtle.decrypt(
+  //     {
+  //       name: "AES-CBC",
+  //       iv: iv
+  //     },
+  //     key,
+  //     this.base64ToArrayBuffer(message.text)
+  //   );
+  //
+  //   return {
+  //     ...message,
+  //     text: new TextDecoder().decode(decryptedText)
+  //   };
+  // }
+
+  // async getPrivateKey(userGuid: string) {
+  //   let jwk = await db.users.get((userGuid)).then((user) => {
+  //     return user!.privateKey!;
+  //   });
+  //
+  //   if (!jwk) {
+  //     throw new Error("Private key not found");
+  //   }
+  //
+  //   return window.crypto.subtle.importKey(
+  //     "jwk",
+  //     JSON.parse(jwk!),
+  //     {
+  //       name: "ECDH",
+  //       namedCurve: "P-384",
+  //     },
+  //     true,
+  //     ["deriveKey"]
+  //   );
+  // }
+
   async createUser(userLogin: AuthUserDto): Promise<RegisterUserDto> {
     let salt = crypto.getRandomValues(new Uint8Array(16));
 
@@ -70,51 +227,47 @@ export class SecurityService {
   async generateKeyPair() {
     return await window.crypto.subtle.generateKey(
       {
-        name: "ECDH",
-        namedCurve: "P-384",
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-512",
       },
       true,
-      ["deriveKey"]
+      ["encrypt", "decrypt"],
     );
   }
 
-  async deriveSharedKey(remotePublicKey: string) {
-    let userId = JSON.parse(localStorage.getItem('user')!).guid;
-
-    let ownPrivateKey = await this.getPrivateKey(userId);
-
-    let remotePublicKeyImported = await window.crypto.subtle.importKey(
-      "raw",
-      this.base64ToArrayBuffer(remotePublicKey),
+  async encryptMessage(message: MessageDto, publicKey: string) {
+    let keyImported = await window.crypto.subtle.importKey(
+      "jwk",
+      JSON.parse(publicKey),
       {
-        name: "ECDH",
-        namedCurve: "P-384",
+        name: "RSA-OAEP",
+        hash: "SHA-512"
       },
       true,
-      []
+      ["encrypt"]
     );
 
-    let derivedKey = await window.crypto.subtle.deriveKey(
+
+    let encryptedMessage = await window.crypto.subtle.encrypt(
       {
-        name: "ECDH",
-        public: remotePublicKeyImported,
+        name: "RSA-OAEP"
       },
-      ownPrivateKey,
-      {
-        name: "AES-CBC",
-        length: 256,
-      },
-      true,
-      ["encrypt", "decrypt"]
+      keyImported,
+      new TextEncoder().encode(message.text)
     );
 
-    let sharedKey = await window.crypto.subtle.exportKey("raw", derivedKey);
-
-    return this.arrayBufferToBase64(sharedKey);
+    return {
+      ...message,
+      text: this.arrayBufferToBase64(encryptedMessage),
+    };
   }
 
-  async createMessage(text: string, chatRoomGuid: string, senderGuid: string, senderUsername: string, sharedKey: string): Promise<MessageDto> {
+  async createMessage(text: string, chatRoomGuid: string, senderGuid: string, senderUsername: string, publicKey: string): Promise<MessageDto> {
     let IV = crypto.getRandomValues(new Uint8Array(16));
+
+    console.log(this.arrayBufferToBase64(IV));
 
     let message: MessageDto = {
       text: text,
@@ -125,90 +278,65 @@ export class SecurityService {
       iv: this.arrayBufferToBase64(IV),
     };
 
-    return await this.encryptMessage(message, sharedKey);
+    return await this.encryptMessage(message, publicKey);
   }
 
-  async encryptMessage(message: MessageDto, sharedKey: string) {
-
-    let IV = this.base64ToArrayBuffer(message.iv);
-
-    let key = await crypto.subtle.importKey(
-      "raw",
-      this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
-      true,
-      ["encrypt", "decrypt"]
-    );
-
-    let encryptedText = await window.crypto.subtle.encrypt(
-      {
-        name: "AES-CBC",
-        iv: IV
-      },
-      key,
-      new TextEncoder().encode(message.text)
-    );
-
-    return {
-      ...message,
-      text: this.arrayBufferToBase64(encryptedText),
-    };
-  }
-
-  async decryptMessages(messages: MessageDto[], sharedKey: string): Promise<MessageDto[]> {
+  async decryptMessages(messages: MessageDto[], privateKey: string): Promise<MessageDto[]> {
     let decryptedMessages: MessageDto[] = [];
 
-    const key = await crypto.subtle.importKey(
-      "raw",
-      this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
+    let keyImported = await window.crypto.subtle.importKey(
+      "jwk",
+      JSON.parse(privateKey),
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-512"
+      },
       true,
-      ["encrypt", "decrypt"]
+      ["decrypt"]
     );
 
     for (let message of messages) {
 
-      let decryptedMessage = await this.decryptMessage(message, key);
+      let decryptedMessage = await this.decryptMessage(message, keyImported);
       decryptedMessages.push(decryptedMessage);
     }
     return decryptedMessages;
   }
 
-  async decryptMessage(message: MessageDto, sharedKey: CryptoKey): Promise<MessageDto> {
-    let iv = this.base64ToArrayBuffer(message.iv);
-
-    let decryptedText = await window.crypto.subtle.decrypt(
+  async decryptMessage(message: MessageDto, privateKey: CryptoKey): Promise<MessageDto> {
+    let decrypted = await window.crypto.subtle.decrypt(
       {
-        name: "AES-CBC",
-        iv: iv
+        name: "RSA-OAEP"
       },
-      sharedKey,
+      privateKey,
       this.base64ToArrayBuffer(message.text)
     );
 
     return {
       ...message,
-      text: new TextDecoder().decode(decryptedText)
+      text: new TextDecoder().decode(decrypted)
     };
   }
 
-  async decryptMessageString(message: MessageDto, sharedKey: string): Promise<MessageDto> {
-
-    const key = await crypto.subtle.importKey(
-      "raw",
-      this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
+  async decryptMessageString(message: MessageDto, privateKey: string): Promise<MessageDto> {
+    let importedKey = await window.crypto.subtle.importKey(
+      "jwk",
+      JSON.parse(privateKey),
+      {
+        name: "RSA-OAEP",
+        hash: "SHA-512",
+        length: 4096
+      },
       true,
-      ["encrypt", "decrypt"]
+      ["decrypt"]
     );
 
-    let iv = this.base64ToArrayBuffer(message.iv);
     let decryptedText = await window.crypto.subtle.decrypt(
       {
-        name: "AES-CBC",
-        iv: iv
+        name: "RSA-OAEP",
+        length: 4096,
       },
-      key,
+      importedKey,
       this.base64ToArrayBuffer(message.text)
     );
 
@@ -231,11 +359,11 @@ export class SecurityService {
       "jwk",
       JSON.parse(jwk!),
       {
-        name: "ECDH",
-        namedCurve: "P-384",
+        name: "RSA-OAEP",
+        hash: "SHA-512"
       },
       true,
-      ["deriveKey"]
+      ["encrypt"]
     );
   }
 }

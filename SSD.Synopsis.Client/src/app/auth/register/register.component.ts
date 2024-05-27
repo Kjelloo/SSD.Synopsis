@@ -47,15 +47,15 @@ export class RegisterComponent {
       userRegister.then(async (user) => {
         let keyPair = await this.securityService.generateKeyPair();
 
-        let publicKey = await crypto.subtle.exportKey("raw", keyPair.publicKey);
-        // export private key to JSON Web Key. Private keys can only be exported as JWK
+        let publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
+
         let privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
-        user.publicKey = this.securityService.arrayBufferToBase64(publicKey);
+        user.publicKey = JSON.stringify(publicKey, null, " ");
 
         this.authService.register(user).subscribe({
           next: async (user) => {
-            user.privateKey = JSON.stringify(privateKey, null, 2);
+            user.privateKey = JSON.stringify(privateKey, null, " ");
 
             // save user to local database
             db.users.add(user);
