@@ -61,8 +61,6 @@ export class LoginComponent implements OnInit{
 
           userLogin.password = this.securityService.arrayBufferToBase64(exportedKey);
 
-          console.log(userLogin.password);
-
           this.authService.login(userLogin).subscribe({
             next: async (user) => {
               if (user && user.token != undefined && user.token.length > 0) {

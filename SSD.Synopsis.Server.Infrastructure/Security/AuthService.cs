@@ -27,8 +27,8 @@ public class AuthService : IAuthService
             new JwtHeader(new SigningCredentials(
                 new SymmetricSecurityKey(_secret),
                 SecurityAlgorithms.HmacSha256)),
-            new JwtPayload(null, // Todo: validate issuer
-                null, // Todo: validate audience
+            new JwtPayload(null, 
+                null, 
                 claims.ToArray(),
                 DateTime.Now, // notBefore
                 DateTime.Now.AddMonths(1))); // expires

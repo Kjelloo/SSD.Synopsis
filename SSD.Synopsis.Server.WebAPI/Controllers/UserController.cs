@@ -78,7 +78,7 @@ public class UserController : ControllerBase
                 Username = userDto.Username,
                 Password = userDto.Password
             };
-
+            
             // password should be run through pbkdf2 for another x amount of iterations
             return Ok(_userService.Login(user));
         }
@@ -104,7 +104,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("Salt/{username}")]
-    public ActionResult<string> Prepare(string username)
+    public ActionResult<string> GetSalt(string username)
     {
         try
         {
@@ -141,10 +141,7 @@ public class UserController : ControllerBase
                 Messages = messages,
                 ChatRooms = chatRooms
             };
-            
-            Console.WriteLine("______________________");
-            Console.WriteLine(messages.Length);
-            
+
             return Ok(data);
         }
         catch (Exception e)
