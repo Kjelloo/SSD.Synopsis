@@ -52,7 +52,6 @@ export class RegisterComponent {
         let privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
 
         user.publicKey = this.securityService.arrayBufferToBase64(publicKey);
-        console.log(user.publicKey);
 
         this.authService.register(user).subscribe({
           next: async (user) => {

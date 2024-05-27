@@ -66,8 +66,6 @@ export class LoginComponent implements OnInit{
               if (user && user.token != undefined && user.token.length > 0) {
                 localStorage.setItem('user', JSON.stringify(user));
 
-                console.log(user.guid!);
-
                 if (await db.users.where("guid").equalsIgnoreCase(user.guid!).count() == 0) {
                   db.users.add(user);
                 }
