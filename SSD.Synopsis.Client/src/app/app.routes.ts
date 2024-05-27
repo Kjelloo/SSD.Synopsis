@@ -12,6 +12,6 @@ export const routes: Routes = [
   {path: 'chat', component: ChatComponent, canActivate: [authGuard]},
   {path: 'gdpr', component: GdprComponent},
   {path: 'userinfo', component: UserinfoComponent, canActivate: [authGuard]},
-  {path: '', redirectTo: 'login', pathMatch: 'full'},
+  {path: '', redirectTo: 'chat', pathMatch: 'full'},
   {path: '**', redirectTo: 'login', pathMatch: 'full'},
 ];

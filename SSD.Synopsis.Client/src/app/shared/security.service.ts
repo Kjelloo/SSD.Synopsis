@@ -40,7 +40,7 @@ export class SecurityService {
         hash: "SHA-256"
       },
       key,
-      {name: "AES-CBC", length: 256},
+      {name: "AES-GCM", length: 256},
       true,
       ["encrypt", "decrypt"]
     );
@@ -101,7 +101,7 @@ export class SecurityService {
       },
       ownPrivateKey,
       {
-        name: "AES-CBC",
+        name: "AES-GCM",
         length: 256,
       },
       true,
@@ -135,14 +135,14 @@ export class SecurityService {
     let key = await crypto.subtle.importKey(
       "raw",
       this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
+      "AES-GCM",
       true,
       ["encrypt", "decrypt"]
     );
 
     let encryptedText = await window.crypto.subtle.encrypt(
       {
-        name: "AES-CBC",
+        name: "AES-GCM",
         iv: IV
       },
       key,
@@ -161,7 +161,7 @@ export class SecurityService {
     const key = await crypto.subtle.importKey(
       "raw",
       this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
+      "AES-GCM",
       true,
       ["encrypt", "decrypt"]
     );
@@ -179,7 +179,7 @@ export class SecurityService {
 
     let decryptedText = await window.crypto.subtle.decrypt(
       {
-        name: "AES-CBC",
+        name: "AES-GCM",
         iv: iv
       },
       sharedKey,
@@ -197,7 +197,7 @@ export class SecurityService {
     const key = await crypto.subtle.importKey(
       "raw",
       this.base64ToArrayBuffer(sharedKey),
-      "AES-CBC",
+      "AES-GCM",
       true,
       ["encrypt", "decrypt"]
     );
@@ -205,7 +205,7 @@ export class SecurityService {
     let iv = this.base64ToArrayBuffer(message.iv);
     let decryptedText = await window.crypto.subtle.decrypt(
       {
-        name: "AES-CBC",
+        name: "AES-GCM",
         iv: iv
       },
       key,
